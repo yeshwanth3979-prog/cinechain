@@ -4,6 +4,40 @@ import { useState, useEffect } from "react";
 import { useGame } from "../contexts/GameContext";
 import { wsService } from "../services/websocket";
 
+const InputField = ({
+    label, value, setter, isLocked, hint, guessValue, colorClass
+}: {
+    label: string, value: string, setter: (v: string) => void, isLocked: boolean, hint: string, guessValue?: string, colorClass: string
+}) => (
+    <div className="group">
+        <label className={`block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider transition-colors group-focus-within:${colorClass}`}>
+            {label}
+        </label>
+        {isLocked ? (
+            <div className="flex items-center gap-3 px-5 py-4 bg-green-500/10 border border-green-500/30 rounded-xl shadow-[0_0_15px_rgba(74,222,128,0.1)] transition-all">
+                <span className="text-xl">✅</span>
+                <span className="text-green-400 font-bold text-lg">{guessValue}</span>
+                <span className="ml-auto text-green-500/50 text-xl font-bold">LOCKED</span>
+            </div>
+        ) : (
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <div className={`w-8 h-8 rounded-lg ${colorClass.replace("text-", "bg-").replace("400", "500/20")} border ${colorClass.replace("text-", "border-").replace("400", "500/30")} flex items-center justify-center font-bold ${colorClass}`}>
+                        {hint}
+                    </div>
+                </div>
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setter(e.target.value)}
+                    placeholder={`Type your guess...`}
+                    className="w-full pl-15 pr-5 py-4 bg-gray-950/40 border border-gray-700/50 rounded-xl text-white font-medium placeholder-gray-600 input-glow focus:outline-none"
+                />
+            </div>
+        )}
+    </div>
+);
+
 export default function GuessForm() {
     const { challenge, myGuess } = useGame();
     const [hero, setHero] = useState("");
@@ -50,40 +84,6 @@ export default function GuessForm() {
         setTimeout(() => setSubmitted(false), 1000);
     };
 
-    const InputField = ({
-        label, value, setter, isLocked, hint, guessValue, colorClass
-    }: {
-        label: string, value: string, setter: (v: string) => void, isLocked: boolean, hint: string, guessValue?: string, colorClass: string
-    }) => (
-        <div className="group">
-            <label className={`block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider transition-colors group-focus-within:${colorClass}`}>
-                {label}
-            </label>
-            {isLocked ? (
-                <div className="flex items-center gap-3 px-5 py-4 bg-green-500/10 border border-green-500/30 rounded-xl shadow-[0_0_15px_rgba(74,222,128,0.1)] transition-all">
-                    <span className="text-xl">✅</span>
-                    <span className="text-green-400 font-bold text-lg">{guessValue}</span>
-                    <span className="ml-auto text-green-500/50 text-xl font-bold">LOCKED</span>
-                </div>
-            ) : (
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <div className={`w-8 h-8 rounded-lg ${colorClass.replace("text-", "bg-").replace("400", "500/20")} border ${colorClass.replace("text-", "border-").replace("400", "500/30")} flex items-center justify-center font-bold ${colorClass}`}>
-                            {hint}
-                        </div>
-                    </div>
-                    <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => setter(e.target.value)}
-                        placeholder={`Type your guess...`}
-                        className="w-full pl-15 pr-5 py-4 bg-gray-950/40 border border-gray-700/50 rounded-xl text-white font-medium placeholder-gray-600 input-glow focus:outline-none"
-                    />
-                </div>
-            )}
-        </div>
-    );
-
     return (
         <div className="w-full max-w-md animate-fade-in-up stagger-1">
             <div className="text-center mb-6">
@@ -100,7 +100,7 @@ export default function GuessForm() {
                         setter={setHero}
                         isLocked={locked.hero}
                         hint={challenge.heroHint}
-                        guessValue={myGuess?.hero}
+                        guessValue={myGuess?.hero ?? undefined}
                         colorClass="text-purple-400"
                     />
 
@@ -110,7 +110,7 @@ export default function GuessForm() {
                         setter={setMovie}
                         isLocked={locked.movie}
                         hint={challenge.movieHint}
-                        guessValue={myGuess?.movie}
+                        guessValue={myGuess?.movie ?? undefined}
                         colorClass="text-pink-400"
                     />
 
@@ -120,7 +120,7 @@ export default function GuessForm() {
                         setter={setHeroine}
                         isLocked={locked.heroine}
                         hint={challenge.heroineHint}
-                        guessValue={myGuess?.heroine}
+                        guessValue={myGuess?.heroine ?? undefined}
                         colorClass="text-blue-400"
                     />
 
