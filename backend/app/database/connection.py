@@ -8,8 +8,8 @@ from app.config import DATABASE_URL
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Async database instance for FastAPI
-database = databases.Database(DATABASE_URL)
+# Async database instance for FastAPI (Limit pool size for Supabase session mode)
+database = databases.Database(DATABASE_URL, min_size=1, max_size=5)
 
 # SQLAlchemy declarative metadata for DDL (Table creation)
 metadata = sqlalchemy.MetaData()
@@ -29,7 +29,8 @@ async def connect_db():
     engine = sqlalchemy.create_engine(
         # databases requires postgresql, asyncpg, etc. but SQLAlchemy DDL engine uses sync dialect
         DATABASE_URL.replace("+asyncpg", "") if "+asyncpg" in DATABASE_URL else DATABASE_URL,
-        connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+        connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
+        poolclass=sqlalchemy.pool.NullPool
     )
     metadata.create_all(engine)
 
