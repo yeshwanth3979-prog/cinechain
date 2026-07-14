@@ -13,6 +13,7 @@ class ClientMsgType(str, Enum):
     EVALUATE_FIELD = "EVALUATE_FIELD"
     PLAY_AGAIN = "PLAY_AGAIN"
     LEAVE_ROOM = "LEAVE_ROOM"
+    CHAT_MESSAGE = "CHAT_MESSAGE"
 
 
 # ─── Server → Client message types ──────────────────────────────────
@@ -33,3 +34,4 @@ class ServerMsgType(str, Enum):
     PLAYER_RECONNECTED = "PLAYER_RECONNECTED"
     ERROR = "ERROR"
     ROOM_STATE = "ROOM_STATE"  # Full state sync for reconnection
+    CHAT_MESSAGE = "CHAT_MESSAGE"

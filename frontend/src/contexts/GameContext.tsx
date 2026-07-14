@@ -9,7 +9,7 @@ import {
     type ReactNode,
 } from "react";
 import { GameState } from "../types/game";
-import type { Player, Challenge, Guess, PendingGuess, Answer, LockedFields } from "../types/game";
+import type { Player, Challenge, Guess, PendingGuess, Answer, LockedFields, ChatMessage } from "../types/game";
 import type { ServerMessage } from "../types/messages";
 import { wsService } from "../services/websocket";
 import { useRoom } from "./RoomContext";
@@ -29,6 +29,7 @@ interface GameContextType {
     winnerName: string | null;
     solverName: string | null;
     readyPlayers: string[];
+    chatMessages: ChatMessage[];
     setGameState: (state: GameState) => void;
     resetGame: () => void;
 }
@@ -52,6 +53,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const [winnerName, setWinnerName] = useState<string | null>(null);
     const [solverName, setSolverName] = useState<string | null>(null);
     const [readyPlayers, setReadyPlayers] = useState<string[]>([]);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
     const resetGame = useCallback(() => {
         setGameState(GameState.LOBBY);
@@ -67,6 +69,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setWinnerName(null);
         setSolverName(null);
         setReadyPlayers([]);
+        setChatMessages([]);
     }, []);
 
     // Handle incoming WebSocket messages
@@ -272,6 +275,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
                     break;
                 }
 
+                case "CHAT_MESSAGE": {
+                    const chatMsg: ChatMessage = {
+                        id: msg.id as string,
+                        senderId: msg.senderId as string,
+                        senderName: msg.senderName as string,
+                        text: msg.text as string,
+                        timestamp: msg.timestamp as string,
+                    };
+                    setChatMessages((prev) => [...prev, chatMsg]);
+                    break;
+                }
+
                 case "ERROR": {
                     console.error("[Game Error]:", msg.message);
                     break;
@@ -303,6 +318,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
                 winnerName,
                 solverName,
                 readyPlayers,
+                chatMessages,
                 setGameState,
                 resetGame,
             }}

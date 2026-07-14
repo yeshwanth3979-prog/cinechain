@@ -6,6 +6,7 @@ export type ClientMessage =
     | { type: "CREATE_CHALLENGE"; hero: string; movie: string; heroine: string }
     | { type: "SUBMIT_GUESS"; hero?: string; movie?: string; heroine?: string }
     | { type: "EVALUATE_FIELD"; playerId: string; field: "hero" | "movie" | "heroine"; status: "correct" | "wrong" | "pending" }
+    | { type: "CHAT_MESSAGE"; message: string }
     | { type: "PLAY_AGAIN" }
     | { type: "LEAVE_ROOM" };
 
@@ -26,7 +27,8 @@ export type ServerMessageType =
     | "PLAYER_DISCONNECTED"
     | "PLAYER_RECONNECTED"
     | "ERROR"
-    | "ROOM_STATE";
+    | "ROOM_STATE"
+    | "CHAT_MESSAGE";
 
 export interface ServerMessage {
     type: ServerMessageType;

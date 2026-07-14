@@ -16,6 +16,7 @@ import EvaluationCard from "../components/EvaluationCard";
 import ScoreBoard from "../components/ScoreBoard";
 import RoundResult from "../components/RoundResult";
 import WinnerScreen from "../components/WinnerScreen";
+import ChatBox from "../components/ChatBox";
 
 export default function GamePage() {
     const { code } = useParams<{ code: string }>();
@@ -50,7 +51,7 @@ export default function GamePage() {
 
             case GameState.CREATE_CHALLENGE:
                 return (
-                    <div className="flex flex-col items-center gap-6">
+                    <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto">
                         <div className="text-center">
                             <p className="text-sm text-purple-400 uppercase tracking-widest mb-1">
                                 Round {currentRound} / {totalRounds}
@@ -63,7 +64,7 @@ export default function GamePage() {
 
             case GameState.GUESSING:
                 return (
-                    <div className="flex flex-col items-center gap-6">
+                    <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto">
                         <div className="text-center">
                             <p className="text-sm text-purple-400 uppercase tracking-widest mb-1">
                                 Round {currentRound} / {totalRounds}
@@ -79,7 +80,7 @@ export default function GamePage() {
 
             case GameState.EVALUATION:
                 return (
-                    <div className="flex flex-col items-center gap-6">
+                    <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto">
                         <EvaluationCard />
                         <ScoreBoard />
                     </div>
@@ -99,8 +100,16 @@ export default function GamePage() {
     return (
         <div className="min-h-screen bg-gray-950">
             <Navbar />
-            <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-20 pb-8">
-                {renderGameView()}
+            <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center min-h-[calc(100vh-4rem)] px-4 pt-24 pb-8 gap-8 w-full max-w-6xl mx-auto">
+                <div className="w-full flex-1 flex flex-col items-center lg:items-end">
+                    {renderGameView()}
+                </div>
+
+                {roomCode && (
+                    <div className="w-full max-w-sm shrink-0 self-center lg:self-start lg:sticky lg:top-24 mt-8 lg:mt-0 flex justify-center lg:justify-start">
+                        <ChatBox />
+                    </div>
+                )}
             </div>
         </div>
     );

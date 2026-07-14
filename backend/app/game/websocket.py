@@ -184,8 +184,33 @@ async def handle_message(room_code: str, user_id: str, msg_type: str, msg: dict)
     elif msg_type == ClientMsgType.LEAVE_ROOM:
         await handle_leave(room, user_id)
 
+    elif msg_type == ClientMsgType.CHAT_MESSAGE:
+        await handle_chat_message(room, user_id, msg)
+
 
 # ─── Individual Handlers ────────────────────────────────────────────
+
+async def handle_chat_message(room, user_id: str, msg: dict):
+    """Handle an incoming chat message."""
+    text = msg.get("message", "").strip()
+    if not text:
+        return
+
+    player = room.players.get(user_id)
+    if not player:
+        return
+
+    import uuid
+    from datetime import datetime
+    
+    # Broadcast to all players in the room
+    await broadcast(room.code, ServerMsgType.CHAT_MESSAGE, {
+        "id": str(uuid.uuid4()),
+        "senderId": user_id,
+        "senderName": player.username,
+        "text": text,
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    })
 
 async def handle_player_ready(room, user_id: str):
     """Handle a player marking themselves as ready."""
