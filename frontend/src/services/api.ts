@@ -95,7 +95,7 @@ export async function joinRoom(roomCode: string) {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({
-            code: roomCode,
+            room_code: roomCode,
         }),
     });
 
