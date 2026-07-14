@@ -26,7 +26,7 @@ async def register(user: UserCreate):
 
     # Create user
     hashed = hash_password(user.password)
-    query = "INSERT INTO users (username, password_hash) VALUES (:username, :password_hash)"
+    query = "INSERT INTO users (username, password_hash) VALUES (:username, :password_hash) RETURNING id"
     user_id = await database.execute(
         query=query,
         values={
