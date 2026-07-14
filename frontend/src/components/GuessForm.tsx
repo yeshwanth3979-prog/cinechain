@@ -31,7 +31,7 @@ const InputField = ({
                     value={value}
                     onChange={(e) => setter(e.target.value)}
                     placeholder={`Type your guess...`}
-                    className="w-full pl-15 pr-5 py-4 bg-gray-950/40 border border-gray-700/50 rounded-xl text-white font-medium placeholder-gray-600 input-glow focus:outline-none"
+                    className="w-full pl-16 pr-5 py-4 bg-gray-950/40 border border-gray-700/50 rounded-xl text-white font-medium placeholder-gray-600 input-glow focus:outline-none"
                 />
             </div>
         )}
