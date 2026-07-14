@@ -101,7 +101,7 @@ export default function GamePage() {
         <div className="min-h-screen bg-gray-950">
             <Navbar />
             <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center min-h-[calc(100vh-4rem)] px-4 pt-24 pb-8 gap-8 w-full max-w-6xl mx-auto">
-                <div className="w-full flex-1 flex flex-col items-center lg:items-end">
+                <div className="w-full flex-1 flex flex-col items-center">
                     {renderGameView()}
                 </div>
 
