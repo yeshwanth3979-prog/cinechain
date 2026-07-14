@@ -18,10 +18,20 @@ class WebSocketService {
         this.reconnectAttempts = 0;
 
         return new Promise((resolve, reject) => {
-            const WS_URL = typeof (import.meta as any).env !== 'undefined' ? (import.meta as any).env.VITE_WS_URL : undefined;
-            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-            const host = window.location.host;
-            const url = WS_URL ? `${WS_URL}/${roomCode}?token=${token}` : `${protocol}//${host}/ws/${roomCode}?token=${token}`;
+            const env = typeof (import.meta as any).env !== 'undefined' ? (import.meta as any).env : {};
+            let baseWsUrl: string;
+
+            if (env.VITE_WS_URL) {
+                baseWsUrl = env.VITE_WS_URL;
+            } else if (env.VITE_API_URL) {
+                baseWsUrl = env.VITE_API_URL.replace(/^http/, 'ws') + '/ws';
+            } else {
+                const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+                const host = window.location.host;
+                baseWsUrl = `${protocol}//${host}/ws`;
+            }
+
+            const url = `${baseWsUrl}/${roomCode}?token=${token}`;
 
             this.ws = new WebSocket(url);
 
