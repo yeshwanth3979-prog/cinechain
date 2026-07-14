@@ -45,3 +45,20 @@ app.include_router(ws_router)
 @app.get("/")
 async def root():
     return {"message": "CineChain API is running"}
+
+
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request, exc):
+    origin = request.headers.get("origin")
+    headers = getattr(exc, "headers", None) or {}
+    if origin:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=headers,
+    )
