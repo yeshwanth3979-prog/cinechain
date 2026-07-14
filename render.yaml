@@ -1,0 +1,24 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: cinechain-backend
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FRONTEND_URL
+        value: "https://cinechain-frontend.onrender.com"
+
+  # Frontend Static Site
+  - type: web
+    name: cinechain-frontend
+    env: static
+    buildCommand: "cd frontend && npm install && npm run build"
+    staticPublishPath: "./frontend/dist"
+    envVars:
+      - key: VITE_API_URL
+        value: "https://cinechain-backend.onrender.com"

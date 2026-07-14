@@ -1,0 +1,46 @@
+"""CineChain Backend — FastAPI application entry point."""
+
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.config import FRONTEND_URL
+from app.database.connection import connect_db, disconnect_db
+from app.auth.routes import router as auth_router
+from app.game.routes import router as game_router
+from app.game.websocket import router as ws_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup/shutdown lifecycle."""
+    await connect_db()
+    yield
+    await disconnect_db()
+
+
+app = FastAPI(
+    title="CineChain",
+    description="Real-time multiplayer movie guessing game",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount routers
+app.include_router(auth_router)
+app.include_router(game_router)
+app.include_router(ws_router)
+
+
+@app.get("/")
+async def root():
+    return {"message": "CineChain API is running"}
