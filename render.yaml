@@ -12,7 +12,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: FRONTEND_URL
-        value: "https://cinechain-frontend.onrender.com"
+        value: "https://cinechain-frontend-v66e.onrender.com"
 
   # Frontend Static Site
   - type: web
