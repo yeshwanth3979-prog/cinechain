@@ -1,37 +1,38 @@
-"""SQLite database connection and initialization."""
+"""Database connection and initialization using databases and SQLAlchemy."""
 
 import databases
-import sqlite3
+import sqlalchemy
 from app.config import DATABASE_URL
 
+# Fix for Render/Supabase PostgreSQL URIs
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # Async database instance for FastAPI
 database = databases.Database(DATABASE_URL)
 
+# SQLAlchemy declarative metadata for DDL (Table creation)
+metadata = sqlalchemy.MetaData()
+
+users_table = sqlalchemy.Table(
+    "users",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column("username", sqlalchemy.String, unique=True, nullable=False),
+    sqlalchemy.Column("password_hash", sqlalchemy.String, nullable=False)
+)
 
 async def connect_db():
     """Connect to database on startup."""
     await database.connect()
-    await create_tables()
-
+    # Create tables synchronously using a temporary SQLAlchemy engine
+    engine = sqlalchemy.create_engine(
+        # databases requires postgresql, asyncpg, etc. but SQLAlchemy DDL engine uses sync dialect
+        DATABASE_URL.replace("+asyncpg", "") if "+asyncpg" in DATABASE_URL else DATABASE_URL,
+        connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+    )
+    metadata.create_all(engine)
 
 async def disconnect_db():
     """Disconnect from database on shutdown."""
     await database.disconnect()
-
-
-async def create_tables():
-    """Create users table if it doesn't exist."""
-    # Use synchronous sqlite3 for DDL (databases library limitation)
-    db_path = DATABASE_URL.replace("sqlite:///", "")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()

@@ -6,3 +6,6 @@ python-multipart==0.0.9
 aiosqlite==0.20.0
 databases==0.9.0
 bcrypt==4.0.1
+sqlalchemy
+asyncpg
+psycopg2-binary

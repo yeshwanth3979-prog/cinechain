@@ -12,7 +12,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 # Database
-DATABASE_URL = "sqlite:///./cinechain.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./cinechain.db")
 
 # Game Settings
 MIN_PLAYERS = 2
