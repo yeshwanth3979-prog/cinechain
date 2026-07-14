@@ -144,6 +144,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
                             movie: null,
                             heroine: null,
                             locked: { hero: false, movie: false, heroine: false },
+                            wrong: { hero: false, movie: false, heroine: false },
                         });
                         setGameState(GameState.GUESSING);
                     }
@@ -161,6 +162,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
                             movie: msg.movie as string | null,
                             heroine: msg.heroine as string | null,
                             locked: msg.locked as LockedFields,
+                            wrong: msg.wrong as LockedFields,
                         };
                         if (existing >= 0) {
                             const updated = [...prev];
@@ -175,15 +177,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
                 case "EVALUATION_RESULT": {
                     const pid = msg.playerId as string;
                     const field = msg.field as "hero" | "movie" | "heroine";
-                    const correct = msg.correct as boolean;
+                    const status = msg.status as string;
                     const locked = msg.locked as LockedFields;
+                    const wrong = msg.wrong as LockedFields;
                     const myId = String(user?.id);
 
                     if (pid === myId) {
                         // I'm the guesser — update my locked fields
                         setMyGuess((prev) => {
                             if (!prev) return prev;
-                            return { ...prev, locked };
+                            return { ...prev, locked, wrong };
                         });
                     }
 
@@ -191,7 +194,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
                     setPendingGuesses((prev) =>
                         prev.map((g) => {
                             if (g.playerId === pid) {
-                                return { ...g, locked };
+                                return { ...g, locked, wrong };
                             }
                             return g;
                         })
