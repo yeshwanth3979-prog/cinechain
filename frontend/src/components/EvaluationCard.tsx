@@ -6,12 +6,12 @@ import { wsService } from "../services/websocket";
 export default function EvaluationCard() {
     const { pendingGuesses, challenge, currentRound, totalRounds } = useGame();
 
-    const handleToggle = (playerId: string, field: "hero" | "movie" | "heroine", currentValue: boolean) => {
+    const handleStatus = (playerId: string, field: "hero" | "movie" | "heroine", status: "correct" | "wrong" | "pending") => {
         wsService.send({
             type: "EVALUATE_FIELD",
             playerId,
             field,
-            correct: !currentValue,
+            status,
         });
     };
 
@@ -66,35 +66,55 @@ export default function EvaluationCard() {
                                 {(["hero", "movie", "heroine"] as const).map((field) => {
                                     const value = guess[field];
                                     const isLocked = guess.locked[field];
+                                    const isWrong = guess.wrong?.[field];
 
                                     return (
                                         <div
                                             key={field}
                                             className={`flex items-center justify-between p-3 rounded-xl border transition-all ${isLocked
-                                                    ? 'bg-green-500/10 border-green-500/30 shadow-[inset_0_0_15px_rgba(74,222,128,0.1)]'
+                                                ? 'bg-green-500/10 border-green-500/30 shadow-[inset_0_0_15px_rgba(74,222,128,0.1)]'
+                                                : isWrong
+                                                    ? 'bg-red-500/10 border-red-500/30 shadow-[inset_0_0_15px_rgba(248,113,113,0.1)]'
                                                     : 'bg-gray-950/40 border-gray-700/50 hover:bg-gray-900/60'
                                                 }`}
                                         >
                                             <div className="flex-1 min-w-0 pr-3">
                                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-0.5">{field}</span>
-                                                <p className={`text-sm font-semibold truncate ${!value ? 'text-gray-600 italic' : isLocked ? 'text-green-400' : 'text-gray-200'
+                                                <p className={`text-sm font-semibold truncate ${!value ? 'text-gray-600 italic' : isLocked ? 'text-green-400' : isWrong ? 'text-red-400 line-through' : 'text-gray-200'
                                                     }`}>
                                                     {value || "No guess yet"}
                                                 </p>
                                             </div>
 
-                                            <button
-                                                onClick={() => handleToggle(guess.playerId, field, isLocked)}
-                                                disabled={!value}
-                                                className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${!value
-                                                        ? "bg-gray-900 border-2 border-gray-800 text-transparent cursor-not-allowed"
+                                            <div className="flex gap-2">
+                                                {/* WRONG BUTTON */}
+                                                <button
+                                                    onClick={() => handleStatus(guess.playerId, field, isWrong ? "pending" : "wrong")}
+                                                    disabled={!value || isLocked}
+                                                    className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${!value || isLocked
+                                                        ? "bg-gray-900 border-2 border-gray-800 text-transparent cursor-not-allowed opacity-50"
+                                                        : isWrong
+                                                            ? "bg-gradient-to-br from-red-400 to-rose-600 border-none text-white shadow-lg shadow-red-500/30 transform scale-105"
+                                                            : "bg-gray-800 border-2 border-gray-600 text-gray-500 hover:border-red-500 hover:text-red-500 active:scale-95"
+                                                        }`}
+                                                >
+                                                    <span className={`text-xl drop-shadow-md ${isWrong ? 'block' : 'hidden group-hover:block'}`}>✗</span>
+                                                </button>
+
+                                                {/* CORRECT BUTTON */}
+                                                <button
+                                                    onClick={() => handleStatus(guess.playerId, field, isLocked ? "pending" : "correct")}
+                                                    disabled={!value}
+                                                    className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${!value
+                                                        ? "bg-gray-900 border-2 border-gray-800 text-transparent cursor-not-allowed opacity-50"
                                                         : isLocked
                                                             ? "bg-gradient-to-br from-green-400 to-emerald-600 border-none text-white shadow-lg shadow-green-500/30 transform scale-105"
                                                             : "bg-gray-800 border-2 border-gray-600 text-gray-500 hover:border-green-500 hover:text-green-500 active:scale-95"
-                                                    }`}
-                                            >
-                                                {isLocked && <span className="text-xl drop-shadow-md">✓</span>}
-                                            </button>
+                                                        }`}
+                                                >
+                                                    {isLocked && <span className="text-xl drop-shadow-md">✓</span>}
+                                                </button>
+                                            </div>
                                         </div>
                                     );
                                 })}

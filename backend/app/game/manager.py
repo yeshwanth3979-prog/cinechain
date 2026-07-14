@@ -53,28 +53,36 @@ def submit_guess(room: Room, player_id: str, hero: str = None, movie: str = None
     return guess
 
 
-def evaluate_field(room: Room, player_id: str, field_name: str, correct: bool) -> dict:
+def evaluate_field(room: Room, player_id: str, field_name: str, status: str) -> dict:
     """
     Evaluate a single field for a player.
+    status should be one of "correct", "wrong", or "pending".
     Returns the evaluation result dict.
     """
     guess = room.guesses.get(player_id)
     if not guess:
         return None
 
-    # Update locked status
+    is_correct = (status == "correct")
+    is_wrong = (status == "wrong")
+
+    # Update status
     if field_name == "hero":
-        guess.locked.hero = correct
+        guess.locked.hero = is_correct
+        guess.wrong.hero = is_wrong
     elif field_name == "movie":
-        guess.locked.movie = correct
+        guess.locked.movie = is_correct
+        guess.wrong.movie = is_wrong
     elif field_name == "heroine":
-        guess.locked.heroine = correct
+        guess.locked.heroine = is_correct
+        guess.wrong.heroine = is_wrong
 
     return {
         "playerId": player_id,
         "field": field_name,
-        "correct": correct,
+        "status": status,
         "locked": guess.locked.to_dict(),
+        "wrong": guess.wrong.to_dict(),
     }
 
 

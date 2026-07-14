@@ -5,13 +5,15 @@ import { useGame } from "../contexts/GameContext";
 import { wsService } from "../services/websocket";
 
 const InputField = ({
-    label, value, setter, isLocked, hint, guessValue, colorClass
+    label, value, setter, isLocked, isWrong, hint, guessValue, colorClass
 }: {
-    label: string, value: string, setter: (v: string) => void, isLocked: boolean, hint: string, guessValue?: string, colorClass: string
+    label: string, value: string, setter: (v: string) => void, isLocked: boolean, isWrong: boolean, hint: string, guessValue?: string, colorClass: string
 }) => (
-    <div className="group">
-        <label className={`block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider transition-colors group-focus-within:${colorClass}`}>
+    <div className="group relative">
+        <label className={`block text-sm font-bold mb-2 uppercase tracking-wider transition-colors ${isWrong ? 'text-red-400' : `text-gray-400 group-focus-within:${colorClass}`
+            }`}>
             {label}
+            {isWrong && <span className="ml-2 text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full border border-red-500/30">❌ Incorrect</span>}
         </label>
         {isLocked ? (
             <div className="flex items-center gap-3 px-5 py-4 bg-green-500/10 border border-green-500/30 rounded-xl shadow-[0_0_15px_rgba(74,222,128,0.1)] transition-all">
@@ -22,7 +24,7 @@ const InputField = ({
         ) : (
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <div className={`w-8 h-8 rounded-lg ${colorClass.replace("text-", "bg-").replace("400", "500/20")} border ${colorClass.replace("text-", "border-").replace("400", "500/30")} flex items-center justify-center font-bold ${colorClass}`}>
+                    <div className={`w-8 h-8 rounded-lg ${isWrong ? 'bg-red-500/20 border-red-500/30 text-red-500' : colorClass.replace("text-", "bg-").replace("400", "500/20") + " border " + colorClass.replace("text-", "border-").replace("400", "500/30") + " " + colorClass} flex items-center justify-center font-bold`}>
                         {hint}
                     </div>
                 </div>
@@ -31,7 +33,10 @@ const InputField = ({
                     value={value}
                     onChange={(e) => setter(e.target.value)}
                     placeholder={`Type your guess...`}
-                    className="w-full pr-5 py-4 bg-gray-950/40 border border-gray-700/50 rounded-xl text-white font-medium placeholder-gray-600 input-glow focus:outline-none"
+                    className={`w-full pr-5 py-4 bg-gray-950/40 border rounded-xl text-white font-medium placeholder-gray-600 focus:outline-none transition-all ${isWrong
+                        ? 'border-red-500/50 shadow-[0_0_15px_rgba(248,113,113,0.15)] focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                        : 'border-gray-700/50 input-glow'
+                        }`}
                     style={{ paddingLeft: '4rem' }}
                 />
             </div>
@@ -100,6 +105,7 @@ export default function GuessForm() {
                         value={hero}
                         setter={setHero}
                         isLocked={locked.hero}
+                        isWrong={myGuess?.wrong?.hero ?? false}
                         hint={challenge.heroHint}
                         guessValue={myGuess?.hero ?? undefined}
                         colorClass="text-purple-400"
@@ -110,6 +116,7 @@ export default function GuessForm() {
                         value={movie}
                         setter={setMovie}
                         isLocked={locked.movie}
+                        isWrong={myGuess?.wrong?.movie ?? false}
                         hint={challenge.movieHint}
                         guessValue={myGuess?.movie ?? undefined}
                         colorClass="text-pink-400"
@@ -120,6 +127,7 @@ export default function GuessForm() {
                         value={heroine}
                         setter={setHeroine}
                         isLocked={locked.heroine}
+                        isWrong={myGuess?.wrong?.heroine ?? false}
                         hint={challenge.heroineHint}
                         guessValue={myGuess?.heroine ?? undefined}
                         colorClass="text-blue-400"

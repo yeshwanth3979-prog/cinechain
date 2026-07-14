@@ -265,18 +265,18 @@ async def handle_submit_guess(room, user_id: str, msg: dict):
 
 
 async def handle_evaluate_field(room, user_id: str, msg: dict):
-    """Handle instant field evaluation (single checkbox click)."""
+    """Handle instant field evaluation (right/wrong checkbox)."""
     if not room.challenge or room.challenge.creator_id != user_id:
         return
 
     player_id = msg.get("playerId")
     field_name = msg.get("field")
-    correct = msg.get("correct", False)
+    status = msg.get("status", "pending")
 
     if field_name not in ("hero", "movie", "heroine"):
         return
 
-    result = manager.evaluate_field(room, player_id, field_name, correct)
+    result = manager.evaluate_field(room, player_id, field_name, status)
     if not result:
         return
 

@@ -84,6 +84,8 @@ class LockedFields:
     def all_correct(self) -> bool:
         return self.hero and self.movie and self.heroine
 
+WrongFields = LockedFields
+
 
 @dataclass
 class Guess:
@@ -92,6 +94,7 @@ class Guess:
     movie: Optional[str] = None
     heroine: Optional[str] = None
     locked: LockedFields = field(default_factory=LockedFields)
+    wrong: WrongFields = field(default_factory=WrongFields)
 
     def to_dict(self) -> dict:
         return {
@@ -100,6 +103,7 @@ class Guess:
             "movie": self.movie,
             "heroine": self.heroine,
             "locked": self.locked.to_dict(),
+            "wrong": self.wrong.to_dict(),
         }
 
 

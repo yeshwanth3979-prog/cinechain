@@ -5,7 +5,7 @@ export type ClientMessage =
     | { type: "PLAYER_READY" }
     | { type: "CREATE_CHALLENGE"; hero: string; movie: string; heroine: string }
     | { type: "SUBMIT_GUESS"; hero?: string; movie?: string; heroine?: string }
-    | { type: "EVALUATE_FIELD"; playerId: string; field: "hero" | "movie" | "heroine"; correct: boolean }
+    | { type: "EVALUATE_FIELD"; playerId: string; field: "hero" | "movie" | "heroine"; status: "correct" | "wrong" | "pending" }
     | { type: "PLAY_AGAIN" }
     | { type: "LEAVE_ROOM" };
 

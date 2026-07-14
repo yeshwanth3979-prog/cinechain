@@ -36,6 +36,7 @@ export interface Guess {
     movie: string | null;
     heroine: string | null;
     locked: LockedFields;
+    wrong: LockedFields;
 }
 
 export interface Answer {
@@ -51,4 +52,5 @@ export interface PendingGuess {
     movie: string | null;
     heroine: string | null;
     locked: LockedFields;
+    wrong: LockedFields;
 }
